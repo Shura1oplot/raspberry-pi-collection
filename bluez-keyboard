@@ -1,0 +1,53 @@
+#!/bin/sh
+
+packages=$(dpkg -l | awk '$1 == "ii" {print $2}')
+
+for dependency in bluez python-gobject; do
+    installed=no
+
+    for package in $packages; do
+        if [ "$package" = "$dependency" ]; then
+            installed=yes
+            break
+        fi
+    done
+
+    if [ "$installed" = no ]; then
+        echo "error: unmet dependency: $dependency" >&2
+        exit 1
+    fi
+done
+
+echo "Scanning..."
+
+devices=$(hcitool scan | sed '1d' | awk '{print "  " NR $0}')
+
+if [ -z "$devices" ]; then
+    echo "error: no devices found" >&2
+    exit 1
+fi
+
+answer=""
+
+while [ -z "$answer" ]; do
+    echo "Bluetooth devices:"
+    echo "${devices}"
+    echo ""
+    read -p "Type selection number: " -r ansnum
+    answer=$(echo "$devices" | sed -n "${ansnum}p" 2>/dev/null)
+done
+
+bdaddr=$(echo "$answer" | awk '{print $2}')
+
+if [ -z "$bdaddr" ]; then
+    echo "error: cannot get bdaddr" >&2
+    exit 1
+fi
+
+echo ""
+
+set -e
+
+bluez-simple-agent hci0 "$bdaddr"
+bluez-test-device trusted "$bdaddr" yes
+bluez-test-input connect "$bdaddr"
