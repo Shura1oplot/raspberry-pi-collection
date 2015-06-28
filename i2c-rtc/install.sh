@@ -15,8 +15,7 @@ i2c-dev
 rtc-ds1307
 EOF
 
-sed 's/^[# \t]*HWCLOCKACCESS=.*$/HWCLOCKACCESS=yes/' -i /etc/default/hwclock
-sed 's/^[# \t]*HCTOSYS_DEVICE=.*$/HCTOSYS_DEVICE=rtc0/' -i /etc/default/hwclock
+sed 's/^[# \t]*HWCLOCKACCESS=.*$/HWCLOCKACCESS=no/' -i /etc/default/hwclock
 
 update-rc.d fake-hwclock remove
 update-rc.d rtc-hwclock defaults 

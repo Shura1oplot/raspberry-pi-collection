@@ -4,7 +4,6 @@
 # Provides:          rtc-ds1307
 # Required-Start:    $local_fs mountdevsubfs
 # Required-Stop:     $local_fs
-# X-Start-Before:    hwclock
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Setup RTC DS1307
@@ -43,7 +42,7 @@ do_start()
 		echo ds1307 0x68 >/sys/class/i2c-adapter/i2c-1/new_device
 	fi
 	test "$(get_state)" = UU || return 2
-	# hwclock -s || return 2
+	hwclock --hctosys --utc --noadjfile || return 2
 }
 
 #
@@ -52,7 +51,8 @@ do_start()
 do_stop()
 {
 	test "$(get_state)" = UU || return 2
-	# hwclock -w || return 2
+	test "$(date +%Y)" -ge 2015 || return 2
+	hwclock --systohc --utc --noadjfile || return 2
 }
 
 case "$1" in
