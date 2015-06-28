@@ -1,21 +1,21 @@
 #! /bin/sh
 
 ### BEGIN INIT INFO
-# Provides:          i2c-rtc-ds1307
+# Provides:          rtc-ds1307
 # Required-Start:    $local_fs mountdevsubfs
 # Required-Stop:     $local_fs
-# X-Start-Before:    ntp
+# X-Start-Before:    hwclock
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Init I2C RTC DS1307 and set clock
+# Short-Description: Setup RTC DS1307
 ### END INIT INFO
 
 # Author: Alexander Gordeyev <s0meuser@yandex.ru>
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="I2C RTC DS1307"
-NAME=i2c-rtc-ds1307
+DESC="RTC DS1307"
+NAME=rtc-ds1307
 SCRIPTNAME=/etc/init.d/$NAME
 
 [ -x /sbin/hwclock ] || exit 0
@@ -31,7 +31,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 get_state()
 {
-	i2cdetect -y 1 | awk '/^60: / {print $10}'
+	i2cdetect -y 1 | awk '/^60: / {print $10}' | head -1
 }
 
 #
@@ -43,7 +43,7 @@ do_start()
 		echo ds1307 0x68 >/sys/class/i2c-adapter/i2c-1/new_device
 	fi
 	test "$(get_state)" = UU || return 2
-	hwclock -s || return 2
+	# hwclock -s || return 2
 }
 
 #
@@ -52,7 +52,7 @@ do_start()
 do_stop()
 {
 	test "$(get_state)" = UU || return 2
-	hwclock -w || return 2
+	# hwclock -w || return 2
 }
 
 case "$1" in
