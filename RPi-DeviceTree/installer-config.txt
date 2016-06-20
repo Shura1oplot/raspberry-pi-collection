@@ -1,0 +1,7 @@
+packages=mc,vim-nox,i2c-tools,python-smbus
+ip_addr=192.168.1.21
+ip_netmask=255.255.255.0
+ip_broadcast=192.168.1.255
+ip_gateway=192.168.1.1
+ip_nameservers=8.8.8.8
+
